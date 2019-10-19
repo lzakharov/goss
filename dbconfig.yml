@@ -1,0 +1,11 @@
+development:
+  dialect: postgres
+  datasource: dbname=postgres sslmode=disable
+  dir: migrations/dev/postgres
+  table: migrations
+
+production:
+  dialect: postgres
+  datasource: dbname=postgres sslmode=disable
+  dir: migrations/prod/postgres
+  table: migrations

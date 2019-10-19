@@ -1,0 +1,33 @@
+FROM golang:1.13
+
+# golangci-lint version
+ENV VERSION 1.21.0
+ENV CHECKSUM 2c861f8dc56b560474aa27cab0c075991628cc01af3451e27ac82f5d10d5106b
+
+# store checksum in a file to be able to compare against it
+RUN echo "${CHECKSUM}  golangci-lint-${VERSION}-linux-amd64.tar.gz" > CHECKSUM
+
+# Download from Github the specified release and extract into the go/bin folder
+RUN curl -L "https://github.com/golangci/golangci-lint/releases/download/v${VERSION}/golangci-lint-${VERSION}-linux-amd64.tar.gz" \
+   -o golangci-lint-${VERSION}-linux-amd64.tar.gz \
+   && shasum -a 256 -c CHECKSUM \
+   && tar xvzf golangci-lint-${VERSION}-linux-amd64.tar.gz \
+       --strip-components=1 \
+       -C ./bin \
+       golangci-lint-${VERSION}-linux-amd64/golangci-lint
+
+# clean up
+RUN rm -rf CHECKSUM "golangci-lint-${VERSION}-linux-amd64.tar.gz"
+
+WORKDIR /go/src/echo
+
+COPY . .
+
+# run linters
+RUN make lint
+
+# run tests
+RUN make test
+
+# try to build the binary
+RUN GOOS=linux GOARCH=amd64 make build

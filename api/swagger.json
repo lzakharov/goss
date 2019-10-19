@@ -1,0 +1,321 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "GoSS API",
+    "version": "1.0",
+    "description": "Go Simple Service API.",
+    "contact": {
+      "name": "Lev Zakharov",
+      "url": "https://www.github.com/lzakharov",
+      "email": "l.j.zakharov@gmail.com"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "example.com",
+  "paths": {
+    "/login": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AuthData"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "Login",
+        "summary": "Login",
+        "description": "Creates a new access token.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/Credentials"
+            }
+          }
+        ]
+      }
+    },
+    "/refresh": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/AuthData"
+            }
+          },
+          "404": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "summary": "Refresh access token",
+        "description": "Refreshes an access token.",
+        "tags": [
+          "Authorization"
+        ],
+        "operationId": "Refresh",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "string",
+              "description": "Refresh token."
+            }
+          }
+        ]
+      }
+    },
+    "/logout": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "",
+            "schema": {}
+          },
+          "500": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "summary": "Logout",
+        "description": "Invalidates an access token.",
+        "operationId": "Logout",
+        "tags": [
+          "Authorization"
+        ],
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Health"
+            }
+          }
+        },
+        "summary": "Check health",
+        "description": "Returns service health status.",
+        "operationId": "CheckHealth",
+        "tags": [
+          "Monitoring"
+        ]
+      }
+    },
+    "/user/self": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        },
+        "summary": "Get user",
+        "description": "Returns the logged in user. ",
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "operationId": "GetUser",
+        "tags": [
+          "Account"
+        ]
+      }
+    }
+  },
+  "basePath": "/v1",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "JWT token based authorization."
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "definitions": {
+    "Credentials": {
+      "type": "object",
+      "title": "Credentials",
+      "description": "User credentials.",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Username."
+        },
+        "password": {
+          "type": "string",
+          "description": "Password."
+        }
+      }
+    },
+    "AuthData": {
+      "type": "object",
+      "title": "Authorization Data",
+      "description": "User authorization data.",
+      "required": [
+        "accessToken",
+        "expiresAt",
+        "refreshToken"
+      ],
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "Access token."
+        },
+        "expiresAt": {
+          "type": "integer",
+          "description": "Access token expiration time."
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "Refresh token."
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "title": "Error",
+      "required": [
+        "status",
+        "message",
+        "requestID"
+      ],
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "Error status."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message."
+        },
+        "requestID": {
+          "type": "string",
+          "description": "Request identifier."
+        }
+      }
+    },
+    "Health": {
+      "type": "object",
+      "title": "Health",
+      "description": "Service health status.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Service version."
+        },
+        "storage": {
+          "description": "Is storage up?",
+          "type": "boolean"
+        },
+        "security": {
+          "type": "boolean",
+          "description": "Is security up?"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "title": "User",
+      "description": "User model.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "User identifier."
+        },
+        "username": {
+          "type": "string",
+          "description": "Username."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role."
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Monitoring"
+    },
+    {
+      "name": "Authorization"
+    }
+  ],
+  "parameters": {},
+  "responses": {}
+}

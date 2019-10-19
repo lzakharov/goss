@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  goss:
+    build: .
+    env_file:
+      - ./configs/dev.env
+    ports:
+      - 8080:8080
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
